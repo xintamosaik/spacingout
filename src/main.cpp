@@ -2,7 +2,7 @@
 
 int main()
 {
-    auto window = sf::RenderWindow(sf::VideoMode({1920u, 1080u}), "CMake SFML Project");
+    auto window = sf::RenderWindow(sf::VideoMode({1920u, 1080u}), "Spacing Out");
     window.setFramerateLimit(144);
 
     while (window.isOpen())
