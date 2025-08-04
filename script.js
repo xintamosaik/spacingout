@@ -83,16 +83,15 @@ function animate(timestamp) {
     // |../.................|.
     // |./..................|.
     // |/.................._L_ angle = 45
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
     const radians = (angle * Math.PI) / 180;
     const cos = Math.cos(radians);
     const sin = Math.sin(radians);
-    const diff_x = x - cx;
-    const diff_y = y - cy;
-
-    const newX = diff_x * cos - diff_y * sin + cx;
-    const newY = diff_x * sin + diff_y * cos + cy;
+    newX = 100 * sin + 50;
+    newY = 100 * cos + 50;
     ctx.beginPath();
-    //ctx.moveTo(x - 10, y);
+    ctx.moveTo(50, 50);
+    // ctx.moveTo(x - 10, y);
     //ctx.lineTo(x, y + 30);
     //ctx.lineTo(x + 10, y);
     ctx.lineTo(newX, newY);
