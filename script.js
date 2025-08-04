@@ -14,16 +14,13 @@ canvas.style.width = `${rect.width}px`;
 canvas.style.height = `${rect.height}px`;
 ctx.fillStyle = "red";
 ctx.strokeStyle = "yellow";
-ctx.beginPath();
-
-ctx.moveTo(100, 100);
-ctx.lineTo(110, 130);
-ctx.lineTo(120, 100);
-ctx.stroke();
 
 const ship_size = 32;
 const ship = ctx.createImageData(ship_size, ship_size);
-
+let acceleration = 0;
+let angle = 0;
+let x = 100;
+let y = 100;
 for (let i = 0; i < ship.data.length; i += 4) {
   const normal = i ? i / 4 : 0;
   const pos = normal / ship_size;
@@ -35,19 +32,119 @@ for (let i = 0; i < ship.data.length; i += 4) {
     mod_hundred > negative_half && mod_hundred < ship_size - negative_half;
 
   ship.data[i + 0] = material ? 190 : 0; // R value
-  ship.data[i + 1] = material ? 0 : 0; // G value
+  ship.data[i + 1] = material ? 255 : 0; // G value
   ship.data[i + 2] = material ? 255 : 0; // B value
   ship.data[i + 3] = 255; // A value
 }
 const STEP = 1000 / FPS;
 let last = STEP;
-ctx.putImageData(ship, 20, 20);
 function animate(timestamp) {
   if (timestamp > last + STEP) {
-    console.log("step");
     last = timestamp;
+    // update
+    if (up) {
+      if (acceleration <= 100) acceleration++;
+    }
+    if (down) {
+      if (acceleration >= 0) acceleration--;
+    }
+    if (left) {
+      if (angle <= 0) angle = 360;
+      angle--;
+    }
+    if (right) {
+      if (angle >= 360) angle = 0;
+      angle++;
+    }
+    // ...___________...
+    // ..A:::::|;;;;;B..
+    // ...\:x::|;;x;/...
+    // ....\:::o;;;/....
+    // .....\::|;;/.....
+    // ......\:|;/......
+    // .......\|/.......
+    // ........C........
+    // .................
+    //
+    // |----- c = 20 --|...___
+    // |...............B....|.
+    // |............../.....|.
+    // |............./......|.
+    // |............/.......|.
+    // |.........../........|.
+    // |........../.........|.
+    // |........./..........a = 20
+    // |......../...........|.
+    // |......./............|.
+    // |....../.............|.
+    // |...../..............|.
+    // |..../...............|.
+    // |.../................|.
+    // |../.................|.
+    // |./..................|.
+    // |/.................._L_ angle = 45
+    const radians = (angle * Math.PI) / 180;
+    const cos = Math.cos(radians);
+    const sin = Math.sin(radians);
+    const diff_x = x - cx;
+    const diff_y = y - cy;
+
+    const newX = diff_x * cos - diff_y * sin + cx;
+    const newY = diff_x * sin + diff_y * cos + cy;
+    ctx.beginPath();
+    //ctx.moveTo(x - 10, y);
+    //ctx.lineTo(x, y + 30);
+    //ctx.lineTo(x + 10, y);
+    ctx.lineTo(newX, newY);
+    ctx.stroke();
   }
+
   requestAnimationFrame(animate);
 }
 
 requestAnimationFrame(animate);
+
+let up = false;
+let left = false;
+let right = false;
+let down = false;
+
+document.addEventListener("keydown", (event) => {
+  switch (event.key) {
+    case "ArrowUp":
+      up = true;
+      break;
+    case "ArrowDown":
+      down = true;
+      break;
+    case "ArrowLeft":
+      left = true;
+      break;
+    case "ArrowRight":
+      right = true;
+      break;
+
+    default:
+      console.log(event.key);
+  }
+});
+
+document.addEventListener("keyup", (event) => {
+  switch (event.key) {
+    case "ArrowUp":
+      up = false;
+      break;
+    case "ArrowDown":
+      down = false;
+      break;
+    case "ArrowLeft":
+      left = false;
+      break;
+    case "ArrowRight":
+      right = false;
+      break;
+
+    default:
+      console.log(event.key);
+  }
+});
