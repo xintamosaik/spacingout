@@ -13,7 +13,6 @@ ctx.scale(dpr, dpr);
 canvas.style.width = `${rect.width}px`;
 canvas.style.height = `${rect.height}px`;
 ctx.fillStyle = "red";
-ctx.strokeStyle = "yellow";
 
 const ship_size = 32;
 const ship = ctx.createImageData(ship_size, ship_size);
@@ -21,6 +20,13 @@ let acceleration = 0;
 let angle = 0;
 let x = 100;
 let y = 100;
+
+let rightX = 0;
+let rightY = 0;
+let leftX = 0;
+let leftY = 0;
+let tipX = 0;
+let tipY = 0;
 for (let i = 0; i < ship.data.length; i += 4) {
   const normal = i ? i / 4 : 0;
   const pos = normal / ship_size;
@@ -48,13 +54,13 @@ function animate(timestamp) {
     if (down) {
       if (acceleration >= 0) acceleration--;
     }
-    if (left) {
-      if (angle <= 0) angle = 360;
-      angle--;
-    }
     if (right) {
+      if (angle <= 0) angle = 360;
+      angle -= 3;
+    }
+    if (left) {
       if (angle >= 360) angle = 0;
-      angle++;
+      angle += 3;
     }
     // ...___________...
     // ..A:::::|;;;;;B..
@@ -84,17 +90,49 @@ function animate(timestamp) {
     // |./..................|.
     // |/.................._L_ angle = 45
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    const radians = (angle * Math.PI) / 180;
-    const cos = Math.cos(radians);
-    const sin = Math.sin(radians);
-    newX = 100 * sin + 50;
-    newY = 100 * cos + 50;
+
+    const radiansRight = ((angle + 135) * Math.PI) / 180;
+    const cosRight = Math.cos(radiansRight);
+    const sinRight = Math.sin(radiansRight);
+    rightX = 20 * sinRight + x;
+    rightY = 20 * cosRight + y;
+
+    const radiansLeft = ((angle + 225) * Math.PI) / 180;
+    const cosLeft = Math.cos(radiansLeft);
+    const sinLeft = Math.sin(radiansLeft);
+    leftX = 20 * sinLeft + x;
+    leftY = 20 * cosLeft + y;
+
+    const radiansTip = (angle * Math.PI) / 180;
+    const cosTip = Math.cos(radiansTip);
+    const sinTip = Math.sin(radiansTip);
+    tipX = 40 * sinTip + x;
+    tipY = 40 * cosTip + y;
+
+    ctx.strokeStyle = "yellow";
     ctx.beginPath();
-    ctx.moveTo(50, 50);
-    // ctx.moveTo(x - 10, y);
-    //ctx.lineTo(x, y + 30);
-    //ctx.lineTo(x + 10, y);
-    ctx.lineTo(newX, newY);
+    ctx.moveTo(x, y);
+    ctx.lineTo(rightX, rightY);
+    ctx.stroke();
+
+    ctx.strokeStyle = "magenta";
+    ctx.beginPath();
+    ctx.lineTo(x, y);
+    ctx.lineTo(tipX, tipY);
+    ctx.stroke();
+
+    ctx.strokeStyle = "cyan";
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(leftX, leftY);
+    ctx.stroke();
+
+    ctx.strokeStyle = "white";
+    ctx.beginPath();
+    ctx.moveTo(leftX, leftY);
+    ctx.lineTo(rightX, rightY);
+    ctx.lineTo(tipX, tipY);
+    ctx.lineTo(leftX, leftY);
     ctx.stroke();
   }
 
