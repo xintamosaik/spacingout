@@ -1,3 +1,5 @@
+const FPS = 60;
+
 const canvas = window.space;
 const dpr = window.devicePixelRatio;
 const rect = canvas.getBoundingClientRect();
@@ -19,15 +21,8 @@ ctx.lineTo(110, 130);
 ctx.lineTo(120, 100);
 ctx.stroke();
 
-// .....##......
-// .....##......
-// ....####.....
-// ....####.....
-// ...######....
-// ...######....
 const ship_size = 32;
 const ship = ctx.createImageData(ship_size, ship_size);
-// Iterate through every pixel
 
 for (let i = 0; i < ship.data.length; i += 4) {
   const normal = i ? i / 4 : 0;
@@ -44,6 +39,15 @@ for (let i = 0; i < ship.data.length; i += 4) {
   ship.data[i + 2] = material ? 255 : 0; // B value
   ship.data[i + 3] = 255; // A value
 }
-
-// Draw image data to the canvas
+const STEP = 1000 / FPS;
+let last = STEP;
 ctx.putImageData(ship, 20, 20);
+function animate(timestamp) {
+  if (timestamp > last + STEP) {
+    console.log("step");
+    last = timestamp;
+  }
+  requestAnimationFrame(animate);
+}
+
+requestAnimationFrame(animate);
