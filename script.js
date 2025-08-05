@@ -38,7 +38,9 @@ const ship = {
     },
   },
 };
-
+let sinTip;
+let cosTip;
+const lasers = [];
 const STEP = 1000 / FPS;
 let last = STEP;
 function animate(timestamp) {
@@ -66,8 +68,8 @@ function animate(timestamp) {
      * Used for the tip, acceleration and possibly projectiles
      */
     const radiansTip = (ship.angle * Math.PI) / 180;
-    const sinTip = Math.sin(radiansTip);
-    const cosTip = Math.cos(radiansTip);
+    sinTip = Math.sin(radiansTip);
+    cosTip = Math.cos(radiansTip);
 
     ship.tip.x = 40 * sinTip + ship.x;
     ship.tip.y = 40 * cosTip + ship.y;
@@ -96,6 +98,7 @@ function animate(timestamp) {
 
     ship.x += ship.acceleration.x;
     ship.y += ship.acceleration.y;
+
     ctx.strokeStyle = "white";
     ctx.beginPath();
     ctx.moveTo(ship.wings.left.x, ship.wings.left.y);
@@ -103,6 +106,14 @@ function animate(timestamp) {
     ctx.lineTo(ship.tip.x, ship.tip.y);
     ctx.lineTo(ship.wings.left.x, ship.wings.left.y);
     ctx.stroke();
+
+    lasers.forEach((laser) => {
+      ctx.strokeStyle = "yellow";
+      ctx.beginPath();
+      ctx.moveTo(laser.x, laser.y);
+      ctx.lineTo(laser.x2, laser.y2);
+      ctx.stroke();
+    });
   }
 
   requestAnimationFrame(animate);
@@ -129,12 +140,18 @@ document.addEventListener("keydown", (event) => {
     case "ArrowRight":
       right = true;
       break;
-
     default:
       console.log(event.key);
   }
 });
-
+function addLaser() {
+  lasers.push({
+    x: ship.tip.x,
+    y: ship.tip.y,
+    x2: ship.tip.x + 300 * sinTip,
+    y2: ship.tip.y + 300 * cosTip,
+  });
+}
 document.addEventListener("keyup", (event) => {
   switch (event.key) {
     case "ArrowUp":
@@ -149,7 +166,8 @@ document.addEventListener("keyup", (event) => {
     case "ArrowRight":
       right = false;
       break;
-
+    case " ":
+      addLaser();
     default:
       console.log(event.key);
   }
