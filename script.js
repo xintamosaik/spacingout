@@ -12,51 +12,43 @@ ctx.scale(dpr, dpr);
 // Set the "drawn" size of the canvas
 canvas.style.width = `${rect.width}px`;
 canvas.style.height = `${rect.height}px`;
-ctx.fillStyle = "red";
+const ship = {
+  x: 50,
+  y: 50,
+  angle: 0,
+  acceleration: {
+    max: 10,
+    x: 0,
+    y: 0,
+  },
+  tip: {
+    x: 0,
+    y: 0,
+  },
+  wings: {
+    left: {
+      x: 0,
+      y: 0,
+    },
+    right: {
+      x: 0,
+      y: 0,
+    },
+  },
+};
 
-const ship_size = 32;
-const ship = ctx.createImageData(ship_size, ship_size);
-let acceleration = 0;
-let angle = 0;
-let x = 100;
-let y = 100;
-const ACCELERATION_MAX = 5;
-let accelerationX = 0;
-let accelerationY = 0;
-
-let rightX = 0;
-let rightY = 0;
-let leftX = 0;
-let leftY = 0;
-let tipX = 0;
-let tipY = 0;
-for (let i = 0; i < ship.data.length; i += 4) {
-  const normal = i ? i / 4 : 0;
-  const pos = normal / ship_size;
-  const floored = Math.floor(pos);
-  const mod_hundred = normal % ship_size;
-  const negative = ship_size - floored;
-  const negative_half = negative / 2;
-  const material =
-    mod_hundred > negative_half && mod_hundred < ship_size - negative_half;
-
-  ship.data[i + 0] = material ? 190 : 0; // R value
-  ship.data[i + 1] = material ? 255 : 0; // G value
-  ship.data[i + 2] = material ? 255 : 0; // B value
-  ship.data[i + 3] = 255; // A value
-}
 const STEP = 1000 / FPS;
 let last = STEP;
 function animate(timestamp) {
   if (timestamp > last + STEP) {
     last = timestamp;
     if (right) {
-      if (angle <= 0) angle = 360;
-      angle -= 3;
+      if (ship.angle <= 0) ship.angle = 360;
+      ship.angle -= 3;
     }
     if (left) {
-      if (angle >= 360) angle = 0;
-      angle += 3;
+      if (ship.angle >= 360) ship.angle = 0;
+      ship.angle += 3;
     }
     // ...___________...
     // ..A:::::|;;;;;B..
@@ -87,41 +79,45 @@ function animate(timestamp) {
     // |/.................._L_ angle = 45
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    const radiansRight = ((angle + 135) * Math.PI) / 180;
-    const cosRight = Math.cos(radiansRight);
-    const sinRight = Math.sin(radiansRight);
-    rightX = 20 * sinRight + x;
-    rightY = 20 * cosRight + y;
+    const radiansRight = ((ship.angle + 135) * Math.PI) / 180;
+    ship.wings.right.x = 20 * Math.sin(radiansRight) + ship.x;
+    ship.wings.right.y = 20 * Math.cos(radiansRight) + ship.y;
 
-    const radiansLeft = ((angle + 225) * Math.PI) / 180;
-    const cosLeft = Math.cos(radiansLeft);
-    const sinLeft = Math.sin(radiansLeft);
-    leftX = 20 * sinLeft + x;
-    leftY = 20 * cosLeft + y;
+    const radiansLeft = ((ship.angle + 225) * Math.PI) / 180;
+    ship.wings.left.x = 20 * Math.sin(radiansLeft) + ship.x;
+    ship.wings.left.y = 20 * Math.cos(radiansLeft) + ship.y;
 
-    const radiansTip = (angle * Math.PI) / 180;
-    const cosTip = Math.cos(radiansTip);
+    /**
+     * Used for the tip, acceleration and possibly projectiles
+     */
+    const radiansTip = (ship.angle * Math.PI) / 180;
     const sinTip = Math.sin(radiansTip);
-    tipX = 40 * sinTip + x;
-    tipY = 40 * cosTip + y;
+    const cosTip = Math.cos(radiansTip);
+
+    ship.tip.x = 40 * sinTip + ship.x;
+    ship.tip.y = 40 * cosTip + ship.y;
     // update
     if (up) {
-      accelerationX += sinTip;
-      accelerationY += cosTip;
+      ship.acceleration.x += sinTip;
+      ship.acceleration.y += cosTip;
     }
     if (down) {
-      accelerationX -= sinTip / 3;
-      accelerationY -= cosTip / 3;
+      ship.acceleration.x -= sinTip / 3;
+      ship.acceleration.y -= cosTip / 3;
     }
-    if (accelerationX >= ACCELERATION_MAX) accelerationX = ACCELERATION_MAX;
-    if (accelerationX <= -ACCELERATION_MAX) accelerationX = -ACCELERATION_MAX;
-    if (accelerationY >= ACCELERATION_MAX) accelerationY = ACCELERATION_MAX;
-    if (accelerationY <= -ACCELERATION_MAX) accelerationY = -ACCELERATION_MAX;
+    if (ship.acceleration.x >= ship.acceleration.max)
+      ship.acceleration.x = ship.acceleration.max;
+    if (ship.acceleration.x <= -ship.acceleration.max)
+      ship.acceleration.x = -ship.acceleration.max;
+    if (ship.acceleration.y >= ship.acceleration.max)
+      ship.acceleration.y = ship.acceleration.max;
+    if (ship.acceleration.y <= -ship.acceleration.max)
+      ship.acceleration.y = -ship.acceleration.max;
 
-    if (y > canvas.scrollHeight) y = 0;
-    if (x > canvas.scrollWidth) x = 0;
-    if (y < 0) y = canvas.scrollHeight;
-    if (x < 0) x = canvas.scrollWidth;
+    if (ship.y > canvas.scrollHeight) ship.y = 0;
+    if (ship.x > canvas.scrollWidth) ship.x = 0;
+    if (ship.y < 0) ship.y = canvas.scrollHeight;
+    if (ship.x < 0) ship.x = canvas.scrollWidth;
     // ctx.strokeStyle = "yellow";
     // ctx.beginPath();
     // ctx.moveTo(x, y);
@@ -139,14 +135,14 @@ function animate(timestamp) {
     // ctx.moveTo(x, y);
     // ctx.lineTo(leftX, leftY);
     // ctx.stroke();
-    x += accelerationX;
-    y += accelerationY;
+    ship.x += ship.acceleration.x;
+    ship.y += ship.acceleration.y;
     ctx.strokeStyle = "white";
     ctx.beginPath();
-    ctx.moveTo(leftX, leftY);
-    ctx.lineTo(rightX, rightY);
-    ctx.lineTo(tipX, tipY);
-    ctx.lineTo(leftX, leftY);
+    ctx.moveTo(ship.wings.left.x, ship.wings.left.y);
+    ctx.lineTo(ship.wings.right.x, ship.wings.right.y);
+    ctx.lineTo(ship.tip.x, ship.tip.y);
+    ctx.lineTo(ship.wings.left.x, ship.wings.left.y);
     ctx.stroke();
   }
 
