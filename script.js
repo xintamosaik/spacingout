@@ -118,23 +118,8 @@ function animate(timestamp) {
     if (ship.x > canvas.scrollWidth) ship.x = 0;
     if (ship.y < 0) ship.y = canvas.scrollHeight;
     if (ship.x < 0) ship.x = canvas.scrollWidth;
-    // ctx.strokeStyle = "yellow";
-    // ctx.beginPath();
-    // ctx.moveTo(x, y);
-    // ctx.lineTo(rightX, rightY);
-    // ctx.stroke();
 
-    // ctx.strokeStyle = "magenta";
-    // ctx.beginPath();
-    // ctx.lineTo(x, y);
-    // ctx.lineTo(tipX, tipY);
-    // ctx.stroke();
-
-    // ctx.strokeStyle = "cyan";
-    // ctx.beginPath();
-    // ctx.moveTo(x, y);
-    // ctx.lineTo(leftX, leftY);
-    // ctx.stroke();
+    
     ship.x += ship.acceleration.x;
     ship.y += ship.acceleration.y;
     ctx.strokeStyle = "white";
