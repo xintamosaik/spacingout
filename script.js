@@ -1,6 +1,7 @@
 const FPS = 60;
 
 const canvas = window.space;
+
 const dpr = window.devicePixelRatio;
 const rect = canvas.getBoundingClientRect();
 const ctx = canvas.getContext("2d", { alpha: false });
@@ -12,6 +13,7 @@ ctx.scale(dpr, dpr);
 // Set the "drawn" size of the canvas
 canvas.style.width = `${rect.width}px`;
 canvas.style.height = `${rect.height}px`;
+
 const ship = {
   x: 50,
   y: 50,
@@ -69,7 +71,7 @@ function animate(timestamp) {
 
     ship.tip.x = 40 * sinTip + ship.x;
     ship.tip.y = 40 * cosTip + ship.y;
-    // update
+
     if (up) {
       ship.acceleration.x += sinTip;
       ship.acceleration.y += cosTip;
