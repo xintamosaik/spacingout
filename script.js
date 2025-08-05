@@ -20,6 +20,9 @@ let acceleration = 0;
 let angle = 0;
 let x = 100;
 let y = 100;
+const ACCELERATION_MAX = 10;
+let accelerationX = 0;
+let accelerationY = 0;
 
 let rightX = 0;
 let rightY = 0;
@@ -47,13 +50,6 @@ let last = STEP;
 function animate(timestamp) {
   if (timestamp > last + STEP) {
     last = timestamp;
-    // update
-    if (up) {
-      if (acceleration <= 100) acceleration++;
-    }
-    if (down) {
-      if (acceleration >= 0) acceleration--;
-    }
     if (right) {
       if (angle <= 0) angle = 360;
       angle -= 3;
@@ -108,25 +104,39 @@ function animate(timestamp) {
     const sinTip = Math.sin(radiansTip);
     tipX = 40 * sinTip + x;
     tipY = 40 * cosTip + y;
+    // update
+    if (up) {
+      accelerationX += sinTip;
+      accelerationY += cosTip;
+    }
+    if (down) {
+      accelerationX -= sinTip / 3;
+      accelerationY -= cosTip / 3;
+    }
+    if (accelerationX >= ACCELERATION_MAX) accelerationX = ACCELERATION_MAX;
+    if (accelerationX <= -ACCELERATION_MAX) accelerationX = -ACCELERATION_MAX;
+    if (accelerationY >= ACCELERATION_MAX) accelerationY = ACCELERATION_MAX;
+    if (accelerationY <= -ACCELERATION_MAX) accelerationY = -ACCELERATION_MAX;
 
-    ctx.strokeStyle = "yellow";
-    ctx.beginPath();
-    ctx.moveTo(x, y);
-    ctx.lineTo(rightX, rightY);
-    ctx.stroke();
+    // ctx.strokeStyle = "yellow";
+    // ctx.beginPath();
+    // ctx.moveTo(x, y);
+    // ctx.lineTo(rightX, rightY);
+    // ctx.stroke();
 
-    ctx.strokeStyle = "magenta";
-    ctx.beginPath();
-    ctx.lineTo(x, y);
-    ctx.lineTo(tipX, tipY);
-    ctx.stroke();
+    // ctx.strokeStyle = "magenta";
+    // ctx.beginPath();
+    // ctx.lineTo(x, y);
+    // ctx.lineTo(tipX, tipY);
+    // ctx.stroke();
 
-    ctx.strokeStyle = "cyan";
-    ctx.beginPath();
-    ctx.moveTo(x, y);
-    ctx.lineTo(leftX, leftY);
-    ctx.stroke();
-
+    // ctx.strokeStyle = "cyan";
+    // ctx.beginPath();
+    // ctx.moveTo(x, y);
+    // ctx.lineTo(leftX, leftY);
+    // ctx.stroke();
+    x += accelerationX;
+    y += accelerationY;
     ctx.strokeStyle = "white";
     ctx.beginPath();
     ctx.moveTo(leftX, leftY);
