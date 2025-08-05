@@ -20,7 +20,7 @@ let acceleration = 0;
 let angle = 0;
 let x = 100;
 let y = 100;
-const ACCELERATION_MAX = 10;
+const ACCELERATION_MAX = 5;
 let accelerationX = 0;
 let accelerationY = 0;
 
@@ -118,6 +118,10 @@ function animate(timestamp) {
     if (accelerationY >= ACCELERATION_MAX) accelerationY = ACCELERATION_MAX;
     if (accelerationY <= -ACCELERATION_MAX) accelerationY = -ACCELERATION_MAX;
 
+    if (y > canvas.scrollHeight) y = 0;
+    if (x > canvas.scrollWidth) x = 0;
+    if (y < 0) y = canvas.scrollHeight;
+    if (x < 0) x = canvas.scrollWidth;
     // ctx.strokeStyle = "yellow";
     // ctx.beginPath();
     // ctx.moveTo(x, y);
